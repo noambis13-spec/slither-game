@@ -7,8 +7,8 @@
 
   const TAU = Math.PI * 2;
   const ARENA = 3000;          // arena radius
-  const BASE = 180;            // px/s
-  const BOOST = 360;           // px/s
+  const BASE = 200;            // px/s
+  const BOOST = 450;           // px/s
   const TURN = 3.8;            // rad/s
   const MAX_FOOD = 3200;
   const BOOST_COST = 8;        // mass per second while boosting
