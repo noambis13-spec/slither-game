@@ -18,7 +18,7 @@ const FILES = {
   '/': ['index.html', 'text/html; charset=utf-8'],
   '/index.html': ['index.html', 'text/html; charset=utf-8'],
   '/client.js': ['client.js', 'application/javascript; charset=utf-8'],
-  '/shared/game.js': ['shared/game.js', 'application/javascript; charset=utf-8']
+  '/shared/game.js': ['game.js', 'application/javascript'], 'application/javascript; charset=utf-8']
 };
 
 const server = http.createServer((req, res) => {
