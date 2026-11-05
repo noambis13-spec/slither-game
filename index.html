@@ -51,9 +51,7 @@
   #minimap { right:12px; bottom:12px; width:110px; height:110px; }
   #roomtag { left:12px; top:12px; background:var(--panel); border:1px solid #1d2a44; border-radius:12px; padding:6px 12px; font-size:14px; pointer-events:auto !important; cursor:pointer; }
   #roomtag b { letter-spacing:4px; color:var(--green); font-size:18px; }
-  #boostBtn { right:140px; bottom:24px; width:76px; height:76px; border-radius:50%; border:3px solid #ffd23d; background:rgba(255,210,61,.18);
-    color:#ffd23d; font-weight:700; display:none; align-items:center; justify-content:center; pointer-events:auto !important; touch-action:none; }
-  @media (pointer:coarse) { #boostBtn { display:flex; } #lb { width:150px; } }
+  
 
   /* Death */
   #death { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,.55); }
@@ -73,7 +71,7 @@
   <div id="lb"><h3>Leaderboard</h3><div id="lbList"></div></div>
   <div id="stats">Your length: <b id="score">10</b><br>Your rank: <b id="rank">-</b> of <span id="total">-</span></div>
   <canvas id="minimap" width="220" height="220"></canvas>
-  <div id="boostBtn">BOOST</div>
+
 </div>
 
 <div id="menu">
