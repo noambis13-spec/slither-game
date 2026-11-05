@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Slither</title>
+<style>
+  :root { --bg:#07090f; --ink:#e9f1ff; --dim:#8a97b3; --green:#3bff7a; --blue:#2e8bff; --panel:rgba(10,14,24,.82); }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body { margin:0; height:100%; overflow:hidden; background:var(--bg); color:var(--ink);
+    font-family:'Trebuchet MS','Segoe UI',system-ui,sans-serif; user-select:none; }
+  canvas#game { position:fixed; inset:0; width:100%; height:100%; touch-action:none; display:block; }
+  .hidden { display:none !important; }
+
+  /* Menu */
+  #menu { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; padding:16px;
+    background:radial-gradient(ellipse at center, rgba(7,9,15,.35), rgba(7,9,15,.8)); overflow:auto; }
+  .card { width:min(430px,100%); display:flex; flex-direction:column; gap:12px; align-items:stretch; }
+  h1 { margin:0; text-align:center; font-size:64px; letter-spacing:2px; font-weight:800; color:#fff;
+    text-shadow:0 0 12px var(--green), 0 0 34px var(--green), 0 0 60px #0a8f3a; }
+  input[type=text] { width:100%; padding:13px 16px; border-radius:28px; border:2px solid #1d2a44; outline:none;
+    background:#0d1220; color:var(--ink); font-size:18px; text-align:center; font-family:inherit; user-select:text; }
+  input[type=text]:focus { border-color:var(--blue); box-shadow:0 0 14px rgba(46,139,255,.5); }
+  .skinbox { background:var(--panel); border:1px solid #1d2a44; border-radius:18px; padding:10px; }
+  .carousel { display:flex; align-items:center; gap:6px; }
+  .carousel canvas { flex:1; height:90px; min-width:0; }
+  .arrow { width:42px; height:42px; border-radius:50%; border:0; background:#16203a; color:var(--ink); font-size:22px; cursor:pointer; }
+  .arrow:hover { background:#1f2d52; }
+  #skinName { text-align:center; color:var(--dim); font-size:14px; margin:2px 0 8px; }
+  #skins { display:grid; grid-template-columns:repeat(8,1fr); gap:6px; }
+  .sw { aspect-ratio:1; border-radius:50%; border:2px solid transparent; cursor:pointer; padding:0; }
+  .sw.sel { border-color:#fff; box-shadow:0 0 10px #fff; transform:scale(1.1); }
+  .btn { width:100%; padding:14px; border:0; border-radius:30px; font-size:20px; font-weight:700; font-family:inherit;
+    cursor:pointer; color:#04120a; background:linear-gradient(#5dff95,#22c95a); box-shadow:0 0 18px rgba(59,255,122,.45); }
+  .btn:hover { filter:brightness(1.1); }
+  .btn.alt { color:#fff; background:linear-gradient(#4a9bff,#2060d8); box-shadow:0 0 18px rgba(46,139,255,.4); font-size:17px; }
+  .row { display:flex; gap:10px; }
+  #joinRow { display:flex; gap:10px; }
+  #code { text-transform:uppercase; letter-spacing:8px; font-weight:700; }
+  #menuMsg { min-height:20px; text-align:center; font-size:14px; color:#ffb4c0; }
+
+  /* HUD */
+  #hud > * { position:fixed; pointer-events:none; }
+  #lb { top:12px; right:12px; width:200px; background:var(--panel); border:1px solid #1d2a44; border-radius:12px; padding:8px 12px; font-size:13px; }
+  #lb h3 { margin:0 0 4px; font-size:13px; text-align:center; color:var(--dim); font-weight:600; }
+  #lb div { display:flex; justify-content:space-between; gap:8px; padding:1px 0; }
+  #lb .me { color:var(--green); font-weight:700; }
+  #lb span:first-child { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  #stats { left:12px; bottom:12px; font-size:15px; line-height:1.5; text-shadow:0 0 6px #000; }
+  #stats b { color:var(--green); }
+  #minimap { right:12px; bottom:12px; width:110px; height:110px; }
+  #roomtag { left:12px; top:12px; background:var(--panel); border:1px solid #1d2a44; border-radius:12px; padding:6px 12px; font-size:14px; pointer-events:auto !important; cursor:pointer; }
+  #roomtag b { letter-spacing:4px; color:var(--green); font-size:18px; }
+  #boostBtn { right:140px; bottom:24px; width:76px; height:76px; border-radius:50%; border:3px solid #ffd23d; background:rgba(255,210,61,.18);
+    color:#ffd23d; font-weight:700; display:none; align-items:center; justify-content:center; pointer-events:auto !important; touch-action:none; }
+  @media (pointer:coarse) { #boostBtn { display:flex; } #lb { width:150px; } }
+
+  /* Death */
+  #death { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,.55); }
+  #death .card { text-align:center; width:min(360px,92%); }
+  #death h2 { margin:0; font-size:34px; color:#ff6b85; text-shadow:0 0 14px #ff2a55; }
+  #death p { margin:0; color:var(--dim); font-size:17px; }
+  #death p b { color:var(--ink); font-size:26px; }
+  #toast { position:fixed; left:50%; top:20px; transform:translateX(-50%); background:#1b2540; border:1px solid var(--blue);
+    padding:10px 18px; border-radius:20px; font-size:15px; z-index:5; }
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+
+<div id="hud" class="hidden">
+  <div id="roomtag" class="hidden" title="Click to copy">Room <b id="roomCode">----</b> <span id="ping" style="color:var(--dim);margin-left:8px"></span></div>
+  <div id="lb"><h3>Leaderboard</h3><div id="lbList"></div></div>
+  <div id="stats">Your length: <b id="score">10</b><br>Your rank: <b id="rank">-</b> of <span id="total">-</span></div>
+  <canvas id="minimap" width="220" height="220"></canvas>
+  <div id="boostBtn">BOOST</div>
+</div>
+
+<div id="menu">
+  <div class="card">
+    <h1>slither</h1>
+    <input type="text" id="nick" maxlength="16" placeholder="Nickname" autocomplete="off" spellcheck="false">
+    <div class="skinbox">
+      <div class="carousel">
+        <button class="arrow" id="skinPrev" aria-label="Previous skin">&#9664;</button>
+        <canvas id="preview" width="260" height="90"></canvas>
+        <button class="arrow" id="skinNext" aria-label="Next skin">&#9654;</button>
+      </div>
+      <div id="skinName"></div>
+      <div id="skins"></div>
+    </div>
+    <button class="btn" id="play">Play (vs Bots)</button>
+    <div class="row">
+      <button class="btn alt" id="create">Create Room</button>
+      <button class="btn alt" id="joinBtn">Join Room</button>
+    </div>
+    <div id="joinRow" class="hidden">
+      <input type="text" id="code" maxlength="4" placeholder="CODE" autocomplete="off" spellcheck="false">
+      <button class="btn alt" id="joinGo" style="width:130px">Join</button>
+    </div>
+    <div id="menuMsg"></div>
+  </div>
+</div>
+
+<div id="death" class="hidden">
+  <div class="card">
+    <h2>You crashed!</h2>
+    <p>Final length <b id="deadScore">0</b></p>
+    <button class="btn" id="again">Play again</button>
+    <button class="btn alt" id="toMenu">Main menu</button>
+  </div>
+</div>
+<div id="toast" class="hidden"></div>
+
+<script src="shared/game.js"></script>
+<script src="client.js"></script>
+</body>
+</html>

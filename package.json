@@ -1,0 +1,9 @@
+{
+  "name": "slither-clone",
+  "version": "1.0.0",
+  "description": "Slither.io-style game: HTML5 Canvas client + authoritative Node.js WebSocket server with rooms",
+  "main": "server.js",
+  "scripts": { "start": "node server.js" },
+  "dependencies": { "ws": "^8.18.0" },
+  "license": "MIT"
+}
