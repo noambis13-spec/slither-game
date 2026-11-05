@@ -90,21 +90,22 @@ function entry(s) {
 /* ---------- input ---------- */
 const input = { angle: 0, boost: false };
 addEventListener('pointermove', e => { input.angle = Math.atan2(e.clientY - H / 2, e.clientX - W / 2); });
+let lastTap = 0;
 cv.addEventListener('pointerdown', e => {
   input.angle = Math.atan2(e.clientY - H / 2, e.clientX - W / 2);
-  if (e.pointerType === 'mouse' && e.button === 0) input.boost = true;
+  const now = Date.now();
+  if (now - lastTap < 300) input.boost = true;
+  lastTap = now;
 });
-addEventListener('pointerup', e => { if (e.pointerType === 'mouse') input.boost = false; });
+addEventListener('pointerup', e => { input.boost = false; });
 addEventListener('keydown', e => {
   if (e.code === 'Space' && document.activeElement.tagName !== 'INPUT') { input.boost = true; e.preventDefault(); }
 });
 addEventListener('keyup', e => { if (e.code === 'Space') input.boost = false; });
 cv.addEventListener('contextmenu', e => e.preventDefault());
-$('boostBtn').addEventListener('pointerdown', () => { input.boost = true; });
-$('boostBtn').addEventListener('pointerup', () => { input.boost = false; });
-$('boostBtn').addEventListener('pointercancel', () => { input.boost = false; });
 
-/* ---------- UI ---------- */
+
+
 let skinIdx = Math.min(SG.SKINS.length - 1, parseInt(store.get('skin', '0'), 10) || 0);
 const nick = $('nick');
 nick.value = store.get('nick', '');
