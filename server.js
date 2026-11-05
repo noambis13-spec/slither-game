@@ -4,7 +4,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const { WebSocketServer } = require('ws');
-const SG = require('./shared/game.js');
+const SG = require('./game.js');
 
 const PORT = process.env.PORT || 3000;
 const TICK_MS = 33;        // simulation rate (~30 Hz)
